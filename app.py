@@ -25,7 +25,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Mã nguồn Web Game hoàn chỉnh với ảnh bìa gốc và âm thanh đúng/sai
+# Mã nguồn Web Game hoàn chỉnh tích hợp sẵn trong Python
 game_html = r"""
 <!DOCTYPE html>
 <html lang="vi">
@@ -148,42 +148,62 @@ game_html = r"""
             display: flex;
         }
 
-        /* Home Screen (Dùng ảnh bìa gốc của bạn) */
+        /* Home Screen (Ảnh nền ban đầu chuẩn cổ phong) */
         #screen-home {
-            justify-content: flex-end;
+            justify-content: center;
             align-items: center;
             text-align: center;
-            background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.4)),
-                        url('https://raw.githubusercontent.com/3cogaibanhtrai/3cogaibanhtrai/main/anhbia.jpg') center/cover no-repeat;
-            padding-bottom: 45px;
-        }
-
-        /* Fallback nếu link ảnh trực tiếp cần đổi, ta dùng đường dẫn base64 hoặc link ảnh chuẩn */
-        #screen-home {
-            background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.5)),
+            background: radial-gradient(circle, rgba(139,38,8,0.3) 0%, rgba(26,15,7,0.85) 100%),
                         url('https://images.unsplash.com/photo-1599707367072-cd69233a37c6?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+            background-blend-mode: overlay;
         }
 
-        /* Nếu bạn tải ảnh bìa lên kho GitHub cùng tên anhbia.jpg, hãy dùng dòng dưới đây: */
-        /* #screen-home { background: url('anhbia.jpg') center/cover no-repeat; } */
+        .title-container {
+            margin-bottom: 30px;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .main-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.2rem;
+            font-weight: 900;
+            background: linear-gradient(180deg, #fff2c2 0%, #f5cf6d 40%, #b8860b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.8);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .sub-title {
+            font-family: 'Merriweather', serif;
+            font-size: 1.3rem;
+            color: #dcdcdc;
+            letter-spacing: 1px;
+        }
 
         .btn-play-big {
             font-family: 'Playfair Display', serif;
-            padding: 15px 45px;
-            font-size: 1.4rem;
+            padding: 16px 50px;
+            font-size: 1.5rem;
             font-weight: 800;
             color: #fff;
             background: linear-gradient(180deg, #d32f2f, #8b2608);
             border: 3px solid var(--gold-primary);
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 0 25px rgba(211, 47, 47, 0.8);
+            box-shadow: 0 0 20px rgba(211, 47, 47, 0.6);
             transition: all 0.2s;
-            z-index: 5;
+            margin-top: 20px;
         }
 
         .btn-play-big:hover {
-            transform: scale(1.06);
+            transform: scale(1.05);
             background: linear-gradient(180deg, #e53935, #a02a0a);
         }
 
@@ -561,10 +581,14 @@ game_html = r"""
             </div>
         </div>
 
-        <!-- Screen 1: Home/Cover (Ảnh bìa gốc) -->
+        <!-- Screen 1: Home/Cover -->
         <div class="screen active" id="screen-home">
+            <div class="title-container">
+                <h1 class="main-title">Bí Ấn Lịch Sử</h1>
+                <p class="sub-title">VIỆT NAM</p>
+            </div>
             <button class="btn-play-big" id="btn-start-game">
-                <i class="fa-solid fa-play" style="margin-right: 8px;"></i> BẮT ĐẦU CHƠI
+                <i class="fa-solid fa-play" style="margin-right: 10px;"></i> BẮT ĐẦU CHƠI
             </button>
         </div>
 
