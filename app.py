@@ -1,3 +1,36 @@
+import streamlit as st
+import streamlit.components.v1 as components
+
+# Cấu hình giao diện Streamlit
+st.set_page_config(
+    page_title="Bí Ấn Lịch Sử Việt Nam",
+    page_icon="📜",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# Bỏ lề và ẩn khung thừa của Streamlit
+st.markdown("""
+    <style>
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
+        .block-container {
+            padding-top: 0rem !important;
+            padding-bottom: 0rem !important;
+            padding-left: 0rem !important;
+            padding-right: 0rem !important;
+            max-width: 100% !important;
+        }
+        iframe {
+            border: none;
+            width: 100%;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# Mã nguồn Web Game
+game_html = """
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -41,12 +74,13 @@
                 radial-gradient(circle at 50% 30%, rgba(139, 38, 8, 0.3) 0%, transparent 70%),
                 radial-gradient(circle at 80% 80%, rgba(245, 207, 109, 0.1) 0%, transparent 50%);
             overflow-x: hidden;
+            padding: 10px;
         }
 
         .game-container {
             width: 100%;
-            max-width: 1000px;
-            height: 680px;
+            max-width: 980px;
+            height: 670px;
             background: linear-gradient(135deg, rgba(44, 26, 14, 0.98), rgba(20, 10, 4, 0.99));
             border: 4px solid var(--gold-dark);
             box-shadow: 0 0 30px rgba(245, 207, 109, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.8);
@@ -57,9 +91,9 @@
             flex-direction: column;
         }
 
-        /* Top Bar & Navigation */
+        /* Top Bar */
         .top-bar {
-            height: 60px;
+            height: 55px;
             background: rgba(15, 7, 2, 0.9);
             border-bottom: 2px solid var(--gold-dark);
             display: flex;
@@ -88,24 +122,23 @@
             background: linear-gradient(180deg, #4a2d18, #261408);
             border: 1px solid var(--gold-primary);
             color: var(--gold-primary);
-            width: 40px;
-            height: 40px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
             transition: all 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
 
         .icon-btn:hover {
-            transform: scale(1.1) rotate(5deg);
+            transform: scale(1.1);
             background: var(--gold-primary);
             color: var(--wood-dark);
         }
 
-        /* Screen Management */
+        /* Screens */
         .screen {
             flex: 1;
             display: none;
@@ -119,7 +152,7 @@
             display: flex;
         }
 
-        /* Screen 1: Bìa Game (Home Screen) */
+        /* Home Screen */
         #screen-home {
             justify-content: center;
             align-items: center;
@@ -131,12 +164,6 @@
 
         .title-container {
             margin-bottom: 30px;
-            animation: float 4s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
         }
 
         .main-title {
@@ -148,7 +175,6 @@
             -webkit-text-fill-color: transparent;
             text-shadow: 0 5px 15px rgba(0,0,0,0.8);
             letter-spacing: 2px;
-            margin-bottom: 5px;
             text-transform: uppercase;
         }
 
@@ -157,38 +183,29 @@
             font-size: 1.3rem;
             color: #dcdcdc;
             letter-spacing: 1px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
 
         .btn-play-big {
             font-family: 'Playfair Display', serif;
             padding: 16px 50px;
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 800;
             color: #fff;
             background: linear-gradient(180deg, #d32f2f, #8b2608);
             border: 3px solid var(--gold-primary);
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 0 20px rgba(211, 47, 47, 0.6), 0 5px 0 #4a1103;
+            box-shadow: 0 0 20px rgba(211, 47, 47, 0.6);
             transition: all 0.2s;
-            position: relative;
-            overflow: hidden;
             margin-top: 20px;
         }
 
         .btn-play-big:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 0 30px rgba(245, 207, 109, 0.8), 0 8px 0 #4a1103;
+            transform: scale(1.05);
             background: linear-gradient(180deg, #e53935, #a02a0a);
         }
 
-        .btn-play-big:active {
-            transform: translateY(2px) scale(0.98);
-            box-shadow: 0 0 10px rgba(211, 47, 47, 0.4), 0 2px 0 #4a1103;
-        }
-
-        /* Screen 2: Chọn Màn (Level Selection) */
+        /* Levels Screen */
         .section-header {
             text-align: center;
             margin-bottom: 20px;
@@ -221,14 +238,13 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            height: 155px;
+            height: 150px;
         }
 
         .level-card:hover:not(.locked) {
-            transform: translateY(-5px);
+            transform: translateY(-4px);
             border-color: var(--gold-primary);
-            box-shadow: 0 10px 20px rgba(245, 207, 109, 0.2);
-            background: linear-gradient(145deg, rgba(74, 45, 24, 0.95), rgba(40, 24, 12, 0.95));
+            box-shadow: 0 8px 18px rgba(245, 207, 109, 0.2);
         }
 
         .level-card.locked {
@@ -241,7 +257,6 @@
             font-size: 0.8rem;
             color: var(--gold-light);
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .level-name {
@@ -250,13 +265,11 @@
             color: #fff;
             font-weight: 700;
             margin: 5px 0;
-            line-height: 1.3;
         }
 
         .level-stars {
             color: var(--gold-primary);
             font-size: 1.1rem;
-            margin-top: 3px;
         }
 
         .lock-icon {
@@ -266,7 +279,7 @@
             color: #aaa;
         }
 
-        /* Screen 3: Màn Chơi Quiz */
+        /* Quiz Gameplay */
         .quiz-header {
             display: flex;
             justify-content: space-between;
@@ -313,8 +326,6 @@
             padding: 16px 20px;
             border-radius: 10px;
             border: 3px solid var(--gold-dark);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            position: relative;
         }
 
         .question-text {
@@ -339,10 +350,10 @@
             font-size: 0.95rem;
             text-align: left;
             cursor: pointer;
-            transition: all 0.2s;
             display: flex;
             align-items: center;
             gap: 10px;
+            transition: all 0.2s;
         }
 
         .option-btn:hover {
@@ -367,16 +378,13 @@
         .option-btn.correct {
             background: linear-gradient(180deg, #2e7d32, #1b5e20) !important;
             border-color: #81c784 !important;
-            color: #fff !important;
         }
 
         .option-btn.wrong {
             background: linear-gradient(180deg, #c62828, #8e0000) !important;
             border-color: #ef9a9a !important;
-            color: #fff !important;
         }
 
-        /* Help Buttons */
         .lifelines {
             display: flex;
             justify-content: center;
@@ -392,25 +400,16 @@
             border-radius: 20px;
             font-size: 0.8rem;
             cursor: pointer;
-            transition: all 0.2s;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        .lifeline-btn:hover:not(.used) {
-            background: var(--gold-primary);
-            color: var(--wood-dark);
-        }
-
         .lifeline-btn.used {
             opacity: 0.4;
             cursor: not-allowed;
-            border-color: #666;
-            color: #aaa;
         }
 
-        /* Explanation Popover */
         .explanation-box {
             background: rgba(26, 15, 7, 0.95);
             border: 2px solid var(--gold-primary);
@@ -420,10 +419,9 @@
             color: var(--parchment);
             margin-top: 5px;
             display: none;
-            line-height: 1.4;
         }
 
-        /* Modal Overlay & Dialogs */
+        /* Modal Settings */
         .modal-overlay {
             position: absolute;
             top: 0;
@@ -435,45 +433,40 @@
             justify-content: center;
             align-items: center;
             z-index: 100;
-            backdrop-filter: blur(4px);
         }
 
         .modal-card {
             background: linear-gradient(135deg, #2c1a0e, #1a0f07);
             border: 3px solid var(--gold-primary);
             border-radius: 12px;
-            width: 450px;
+            width: 420px;
             padding: 25px;
-            box-shadow: 0 0 25px rgba(0,0,0,0.9);
-            position: relative;
         }
 
         .modal-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             color: var(--gold-primary);
             margin-bottom: 20px;
             text-align: center;
             border-bottom: 1px solid var(--gold-dark);
-            padding-bottom: 10px;
+            padding-bottom: 8px;
         }
 
         .setting-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 18px;
-            font-size: 1.05rem;
+            margin-bottom: 15px;
         }
 
         .toggle-switch {
-            width: 50px;
-            height: 26px;
+            width: 48px;
+            height: 24px;
             background: #444;
-            border-radius: 13px;
+            border-radius: 12px;
             position: relative;
             cursor: pointer;
-            transition: 0.3s;
         }
 
         .toggle-switch.active {
@@ -483,8 +476,8 @@
         .toggle-switch::after {
             content: '';
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             background: #fff;
             border-radius: 50%;
             top: 3px;
@@ -500,7 +493,7 @@
             background: var(--red-bright);
             color: #fff;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 18px;
             border-radius: 6px;
             cursor: pointer;
             float: right;
@@ -508,7 +501,7 @@
             font-weight: bold;
         }
 
-        /* Movie Credits Screen */
+        /* Credits Screen */
         .credits-container {
             height: 100%;
             display: flex;
@@ -533,7 +526,7 @@
 
         .credits-title {
             font-family: 'Playfair Display', serif;
-            font-size: 2.3rem;
+            font-size: 2.2rem;
             color: var(--gold-primary);
             margin-bottom: 20px;
         }
@@ -543,7 +536,7 @@
         }
 
         .credits-role {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--gold-light);
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -552,7 +545,7 @@
 
         .credits-name {
             font-family: 'Merriweather', serif;
-            font-size: 1.4rem;
+            font-size: 1.35rem;
             color: #fff;
             font-weight: 700;
         }
@@ -568,11 +561,6 @@
             border-radius: 25px;
             cursor: pointer;
             font-weight: bold;
-        }
-
-        .btn-back-menu:hover {
-            background: var(--gold-primary);
-            color: var(--wood-dark);
         }
     </style>
 </head>
@@ -606,11 +594,9 @@
         <div class="screen" id="screen-levels">
             <div class="section-header">
                 <h2 class="section-title">CHỌN MÀN CHƠI</h2>
-                <p style="color: #bbb; font-size: 0.9rem;">Hoàn thành các màn chơi để mở khóa giai đoạn lịch sử tiếp theo</p>
+                <p style="color: #bbb; font-size: 0.9rem;">Hoàn thành các màn chơi để mở khóa giai đoạn tiếp theo</p>
             </div>
-            <div class="levels-grid" id="levels-grid">
-                <!-- Dynamically generated levels -->
-            </div>
+            <div class="levels-grid" id="levels-grid"></div>
         </div>
 
         <!-- Screen 3: Quiz Gameplay -->
@@ -634,9 +620,7 @@
                     <div class="question-text" id="question-text">Đang tải câu hỏi...</div>
                 </div>
 
-                <div class="options-grid" id="options-grid">
-                    <!-- Options buttons will be generated here -->
-                </div>
+                <div class="options-grid" id="options-grid"></div>
 
                 <div class="explanation-box" id="explanation-box">
                     <strong><i class="fa-solid fa-circle-info"></i> Giải thích lịch sử:</strong>
@@ -707,7 +691,6 @@
     </div>
 
     <script>
-        // Data Game: 6 Levels, 15 Questions per level = Total 90 Questions
         const gameData = [
             {
                 id: 1,
@@ -843,7 +826,6 @@
             }
         ];
 
-        // App State
         let currentState = {
             currentLevelIdx: 0,
             currentQuestionIdx: 0,
@@ -857,7 +839,6 @@
             lifelines: { p5050: true, hint: true, audience: true }
         };
 
-        // Audio Context for Effects
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         
         function playBeep(freq, duration) {
@@ -875,7 +856,6 @@
             } catch(e){}
         }
 
-        // Load & Save Progress
         function loadProgress() {
             const saved = localStorage.getItem('historacle_progress');
             if (saved) {
@@ -892,7 +872,6 @@
             }));
         }
 
-        // Navigation
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
@@ -902,7 +881,6 @@
             }
         }
 
-        // Render Levels Screen
         function renderLevels() {
             const grid = document.getElementById('levels-grid');
             grid.innerHTML = '';
@@ -938,12 +916,190 @@
             });
         }
 
-        // Start Level
         function startLevel(lvlIdx) {
             currentState.currentLevelIdx = lvlIdx;
             currentState.currentQuestionIdx = 0;
             currentState.score = 0;
             currentState.lifelines = { p5050: true, hint: true, audience: true };
             
-            // Reset Lifeline UI
             document.querySelectorAll('.lifeline-btn').forEach(btn => btn.classList.remove('used'));
+
+            showScreen('screen-quiz');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            clearInterval(currentState.timer);
+            const level = gameData[currentState.currentLevelIdx];
+            const qData = level.questions[currentState.currentQuestionIdx];
+
+            document.getElementById('quiz-level-title').innerText = level.title;
+            document.getElementById('quiz-progress').innerText = `Câu ${currentState.currentQuestionIdx + 1}/${level.questions.length}`;
+            document.getElementById('quiz-score').innerText = currentState.score;
+            document.getElementById('question-text').innerText = qData.q;
+            document.getElementById('explanation-box').style.display = 'none';
+
+            const optionsGrid = document.getElementById('options-grid');
+            optionsGrid.innerHTML = '';
+
+            const prefixes = ['A', 'B', 'C', 'D'];
+            qData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `<span class="option-prefix">${prefixes[idx]}</span> <span>${opt}</span>`;
+                btn.onclick = () => selectOption(idx);
+                optionsGrid.appendChild(btn);
+            });
+
+            currentState.timeLeft = level.timePerQuestion;
+            document.getElementById('timer-display').innerText = currentState.timeLeft;
+            
+            currentState.timer = setInterval(() => {
+                currentState.timeLeft--;
+                document.getElementById('timer-display').innerText = currentState.timeLeft;
+                
+                if (currentState.timeLeft <= 0) {
+                    clearInterval(currentState.timer);
+                    playBeep(200, 0.3);
+                    showExplanation(false, "Đã hết thời gian trả lời!");
+                }
+            }, 1000);
+        }
+
+        function selectOption(idx) {
+            clearInterval(currentState.timer);
+            const level = gameData[currentState.currentLevelIdx];
+            const qData = level.questions[currentState.currentQuestionIdx];
+            const btns = document.querySelectorAll('.option-btn');
+
+            btns.forEach(b => b.onclick = null);
+
+            if (idx === qData.correct) {
+                btns[idx].classList.add('correct');
+                currentState.score += 10;
+                document.getElementById('quiz-score').innerText = currentState.score;
+                playBeep(600, 0.2);
+                showExplanation(true);
+            } else {
+                btns[idx].classList.add('wrong');
+                btns[qData.correct].classList.add('correct');
+                playBeep(180, 0.4);
+                showExplanation(false);
+            }
+        }
+
+        function showExplanation(isCorrect, customMsg) {
+            const qData = gameData[currentState.currentLevelIdx].questions[currentState.currentQuestionIdx];
+            const expBox = document.getElementById('explanation-box');
+            const expText = document.getElementById('explanation-text');
+
+            expText.innerText = (customMsg ? customMsg + " " : "") + qData.exp;
+            expBox.style.display = 'block';
+
+            setTimeout(() => {
+                currentState.currentQuestionIdx++;
+                const level = gameData[currentState.currentLevelIdx];
+
+                if (currentState.currentQuestionIdx < level.questions.length) {
+                    loadQuestion();
+                } else {
+                    finishLevel();
+                }
+            }, 3200);
+        }
+
+        function finishLevel() {
+            const lvlIdx = currentState.currentLevelIdx;
+            if (currentState.score > currentState.levelScores[lvlIdx]) {
+                currentState.levelScores[lvlIdx] = currentState.score;
+            }
+
+            if (currentState.score >= 50 && lvlIdx + 1 < gameData.length) {
+                if (currentState.unlockedLevels < lvlIdx + 2) {
+                    currentState.unlockedLevels = lvlIdx + 2;
+                }
+            }
+
+            saveProgress();
+
+            if (lvlIdx === gameData.length - 1) {
+                alert(`Chúc mừng bạn đã xuất sắc vượt qua toàn bộ 6 màn chơi lịch sử với số điểm ${currentState.score}!`);
+                showScreen('screen-credits');
+            } else {
+                alert(`Màn chơi kết thúc!\nĐiểm của bạn: ${currentState.score}/${gameData[lvlIdx].questions.length * 10}`);
+                showScreen('screen-levels');
+            }
+        }
+
+        document.getElementById('btn-5050').onclick = function() {
+            if (!currentState.lifelines.p5050) return;
+            currentState.lifelines.p5050 = false;
+            this.classList.add('used');
+
+            const qData = gameData[currentState.currentLevelIdx].questions[currentState.currentQuestionIdx];
+            const btns = document.querySelectorAll('.option-btn');
+            let removed = 0;
+
+            btns.forEach((btn, idx) => {
+                if (idx !== qData.correct && removed < 2) {
+                    btn.style.visibility = 'hidden';
+                    removed++;
+                }
+            });
+        };
+
+        document.getElementById('btn-hint').onclick = function() {
+            if (!currentState.lifelines.hint) return;
+            currentState.lifelines.hint = false;
+            this.classList.add('used');
+
+            const qData = gameData[currentState.currentLevelIdx].questions[currentState.currentQuestionIdx];
+            alert(`Gợi ý: ${qData.exp.substring(0, 50)}...`);
+        };
+
+        document.getElementById('btn-audience').onclick = function() {
+            if (!currentState.lifelines.audience) return;
+            currentState.lifelines.audience = false;
+            this.classList.add('used');
+
+            const qData = gameData[currentState.currentLevelIdx].questions[currentState.currentQuestionIdx];
+            const prefixes = ['A', 'B', 'C', 'D'];
+            alert(`Khán giả trường quay bình chọn cao nhất cho đáp án: ${prefixes[qData.correct]}`);
+        };
+
+        document.getElementById('btn-start-game').onclick = () => showScreen('screen-levels');
+        document.getElementById('btn-home').onclick = () => showScreen('screen-home');
+        document.getElementById('btn-credits').onclick = () => showScreen('screen-credits');
+        
+        const modalSettings = document.getElementById('modal-settings');
+        document.getElementById('btn-settings').onclick = () => modalSettings.style.display = 'flex';
+        document.getElementById('btn-close-settings').onclick = () => modalSettings.style.display = 'none';
+
+        document.getElementById('toggle-sfx').onclick = function() {
+            this.classList.toggle('active');
+            currentState.sfxEnabled = this.classList.contains('active');
+        };
+
+        document.getElementById('toggle-bgm').onclick = function() {
+            this.classList.toggle('active');
+            currentState.bgmEnabled = this.classList.contains('active');
+        };
+
+        document.getElementById('btn-reset-data').onclick = function() {
+            if (confirm("Bạn có chắc chắn muốn xóa toàn bộ tiến trình chơi?")) {
+                localStorage.removeItem('historacle_progress');
+                currentState.unlockedLevels = 1;
+                currentState.levelScores = [0,0,0,0,0,0];
+                modalSettings.style.display = 'none';
+                showScreen('screen-levels');
+            }
+        };
+
+        loadProgress();
+    </script>
+</body>
+</html>
+"""
+
+# Hiển thị game trong khung iframe rộng trên Streamlit
+components.html(game_html, height=720, scrolling=False)
