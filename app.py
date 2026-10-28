@@ -9,7 +9,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Bỏ lề và ẩn khung thừa của Streamlit
+# Ẩn thanh công cụ mặc định của Streamlit
 st.markdown("""
     <style>
         #MainMenu {visibility: hidden;}
@@ -22,15 +22,11 @@ st.markdown("""
             padding-right: 0rem !important;
             max-width: 100% !important;
         }
-        iframe {
-            border: none;
-            width: 100%;
-        }
     </style>
 """, unsafe_allow_html=True)
 
-# Mã nguồn Web Game
-game_html = """
+# Mã nguồn Web Game hoàn chỉnh tích hợp sẵn trong Python
+game_html = r"""
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -152,7 +148,7 @@ game_html = """
             display: flex;
         }
 
-        /* Home Screen (Ảnh nền ban đầu chuẩn cổ phong lịch sử) */
+        /* Home Screen (Ảnh nền ban đầu chuẩn cổ phong) */
         #screen-home {
             justify-content: center;
             align-items: center;
@@ -847,17 +843,15 @@ game_html = """
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         
-        // Hiệu ứng âm thanh khi trả lời đúng / sai
         function playSound(type) {
             if (!currentState.sfxEnabled) return;
             try {
                 if (type === 'correct') {
-                    // Tiếng chuông ngân vui tươi (2 nốt nhạc)
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
                     osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // Nốt D5
-                    osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1); // Nốt A5
+                    osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
                     gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
                     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
                     osc.connect(gain);
@@ -865,7 +859,6 @@ game_html = """
                     osc.start();
                     osc.stop(audioCtx.currentTime + 0.35);
                 } else if (type === 'wrong') {
-                    // Tiếng bíp trầm cảnh báo
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
                     osc.type = 'sawtooth';
@@ -1003,9 +996,128 @@ game_html = """
                 btns[idx].classList.add('correct');
                 currentState.score += 10;
                 document.getElementById('quiz-score').innerText = currentState.score;
-                playSound('correct'); // Phát âm thanh đúng
+                playSound('correct');
                 showExplanation(true);
             } else {
                 btns[idx].classList.add('wrong');
                 btns[qData.correct].classList.add('correct');
-                playSound('wrong'); // Phát
+                playSound('wrong');
+                showExplanation(false);
+            }
+        }
+
+        function showExplanation(isCorrect, customMsg) {
+            const qData = gameData[currentState.currentLevelIdx].questions[currentState.currentQuestionIdx];
+            const expBox = document.getElementById('explanation-box');
+            const expText = document.getElementById('explanation-text');
+
+            expText.innerText = (customMsg ? customMsg + " " : "") + qData.exp;
+            expBox.style.display = 'block';
+
+            setTimeout(() => {
+                currentState.currentQuestionIdx++;
+                const level = gameData[currentState.currentLevelIdx];
+
+                if (currentState.currentQuestionIdx < level.questions.length) {
+                    loadQuestion();
+                } else {
+                    finishLevel();
+                }
+            }, 3200);
+        }
+
+        function finishLevel() {
+            const lvlIdx = currentState.currentLevelIdx;
+            if (currentState.score > currentState.levelScores[lvlIdx]) {
+                currentState.levelScores[lvlIdx] = currentState.score;
+            }
+
+            if (currentState.score >= 50 && lvlIdx + 1 < gameData.length) {
+                if (currentState.unlockedLevels < lvlIdx + 2) {
+                    currentState.unlockedLevels = lvlIdx + 2;
+                }
+            }
+
+            saveProgress();
+
+            if (lvlIdx === gameData.length - 1) {
+                alert(`Chúc mừng bạn đã xuất sắc vượt qua toàn bộ 6 màn chơi lịch sử với số điểm ${currentState.score}!`);
+                showScreen('screen-credits');
+            } else {
+                alert(`Màn chơi kết thúc!\nĐiểm của bạn: ${currentState.score}/${gameData[lvlIdx].questions.length * 10}`);
+                showScreen('screen-levels');
+            }
+        }
+
+        document.getElementById('btn-5050').onclick = function() {
+            if (!currentState.lifelines.p5050) return;
+            currentState.lifelines.p5050 = false;
+            this.classList.add('used');
+
+            const qData = gameData[currentState.currentLevelIdx].questions[currentState.currentQuestionIdx];
+            const btns = document.querySelectorAll('.option-btn');
+            let removed = 0;
+
+            btns.forEach((btn, idx) => {
+                if (idx !== qData.correct && removed < 2) {
+                    btn.style.visibility = 'hidden';
+                    removed++;
+                }
+            });
+        };
+
+        document.getElementById('btn-hint').onclick = function() {
+            if (!currentState.lifelines.hint) return;
+            currentState.lifelines.hint = false;
+            this.classList.add('used');
+
+            const qData = gameData[currentState.currentLevelIdx].questions[currentState.currentQuestionIdx];
+            alert(`Gợi ý: ${qData.exp.substring(0, 50)}...`);
+        };
+
+        document.getElementById('btn-audience').onclick = function() {
+            if (!currentState.lifelines.audience) return;
+            currentState.lifelines.audience = false;
+            this.classList.add('used');
+
+            const qData = gameData[currentState.currentLevelIdx].questions[currentState.currentQuestionIdx];
+            const prefixes = ['A', 'B', 'C', 'D'];
+            alert(`Khán giả trường quay bình chọn cao nhất cho đáp án: ${prefixes[qData.correct]}`);
+        };
+
+        document.getElementById('btn-start-game').onclick = () => showScreen('screen-levels');
+        document.getElementById('btn-home').onclick = () => showScreen('screen-home');
+        document.getElementById('btn-credits').onclick = () => showScreen('screen-credits');
+        
+        const modalSettings = document.getElementById('modal-settings');
+        document.getElementById('btn-settings').onclick = () => modalSettings.style.display = 'flex';
+        document.getElementById('btn-close-settings').onclick = () => modalSettings.style.display = 'none';
+
+        document.getElementById('toggle-sfx').onclick = function() {
+            this.classList.toggle('active');
+            currentState.sfxEnabled = this.classList.contains('active');
+        };
+
+        document.getElementById('toggle-bgm').onclick = function() {
+            this.classList.toggle('active');
+            currentState.bgmEnabled = this.classList.contains('active');
+        };
+
+        document.getElementById('btn-reset-data').onclick = function() {
+            if (confirm("Bạn có chắc chắn muốn xóa toàn bộ tiến trình chơi?")) {
+                localStorage.removeItem('historacle_progress');
+                currentState.unlockedLevels = 1;
+                currentState.levelScores = [0,0,0,0,0,0];
+                modalSettings.style.display = 'none';
+                showScreen('screen-levels');
+            }
+        };
+
+        loadProgress();
+    </script>
+</body>
+</html>
+"""
+
+# Hiển thị ứng dụng Web Game thông qua thành phần components của Streamlit
+components.html(game_html, height=720, scrolling=False)
